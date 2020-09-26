@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.google.crypto.tink:tink:1.4.0" type="repository">
+    <properties maven-id="com.google.crypto.tink:tink:1.4.0" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/crypto/tink/tink/1.4.0/tink-1.4.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/3.11.1/protobuf-java-3.11.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/json/json/20180813/json-20180813.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
