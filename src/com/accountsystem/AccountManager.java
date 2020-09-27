@@ -68,7 +68,7 @@ public class AccountManager{
 
     private static String encryptPassword(String password, UUID uuid) throws GeneralSecurityException {
         Encrypter.initEncrypter();
-        String encryptedData = Encrypter.encrypt(password, uuid.toString());
+        String encryptedData = Encrypter.encrypt(password);
         return encryptedData;
     }
 
@@ -121,7 +121,9 @@ public class AccountManager{
         for (Object obj : uuidSet) {
             JSONObject jsonObject = readFromJson(obj.toString());
             String encryptedPass = jsonObject.get(PASSKEY).toString();
-            String currentAttemptPasswordHash = Encrypter.decrypt(password, jsonObject.get(UUIDKEY).toString());
+            byte[] hash = Base64.getUrlDecoder().decode(encryptedPass);
+            byte[] salt = Arrays.copyOfRange(hash, 0, 16);
+            String currentAttemptPasswordHash = Encrypter.encryptWithGivenSalt(password, salt);
             System.out.println(currentAttemptPasswordHash);
             System.out.println(encryptedPass);
             if (encryptedPass.equals(currentAttemptPasswordHash)) {

@@ -47,6 +47,9 @@ public class Main {
                             System.out.println(account.getUUID());
                             System.out.println("Logged in");
                         }
+                        if(account.isNull()){
+                            System.out.println("Null account returned");
+                        }
                     } catch (ParseException | GeneralSecurityException e) {
                         e.printStackTrace();
                     }
