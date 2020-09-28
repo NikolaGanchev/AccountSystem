@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="com.google.crypto.tink:tink:1.4.0" level="project" />
+    <orderEntry type="library" name="com.kosprov.jargon2:jargon2-api:1.1.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="com.kosprov.jargon2:jargon2-native-ri-backend:1.1.1" level="project" />
   </component>
 </module>

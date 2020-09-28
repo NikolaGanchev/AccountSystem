@@ -16,6 +16,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 import java.util.Random;
+import static com.kosprov.jargon2.api.Jargon2.*;
 
 public class Encrypter {
     private static SecureRandom random = new SecureRandom();
@@ -77,24 +78,25 @@ public class Encrypter {
     }
 
     public static String encrypt(String dataToEncrypt) throws GeneralSecurityException {
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(dataToEncrypt.toCharArray(), salt, 65536, 128);
-        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        byte[] hash = f.generateSecret(spec).getEncoded();
-        Base64.Encoder enc = Base64.getUrlEncoder().withoutPadding();
-        System.out.printf("salt: %s%n", enc.encodeToString(salt));
-        System.out.printf("hash: %s%n", enc.encodeToString(hash));
-        return enc.encodeToString(hash);
+        byte[] password = dataToEncrypt.getBytes();
+
+        Hasher hasher = jargon2Hasher()
+                .type(Type.ARGON2id)
+                .memoryCost(65536)
+                .timeCost(3)
+                .parallelism(3)
+                .saltLength(16)
+                .hashLength(16);
+
+        String passwordHash = hasher.password(password).encodedHash();
+
+        return passwordHash;
     }
 
-    public static String encryptWithGivenSalt(String dataToEncrypt, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        KeySpec spec = new PBEKeySpec(dataToEncrypt.toCharArray(), salt, 65536, 128);
-        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        byte[] hash = f.generateSecret(spec).getEncoded();
-        Base64.Encoder enc = Base64.getUrlEncoder().withoutPadding();
-        System.out.printf("salt: %s%n", enc.encodeToString(salt));
-        System.out.printf("hash: %s%n", enc.encodeToString(hash));
-        return enc.encodeToString(hash);
+    public static boolean authorizePassword(String passwordHash, String attemptedPassword){
+        Verifier verifier = jargon2Verifier();
+
+        boolean hashesMatch = verifier.hash(passwordHash).password(attemptedPassword.getBytes()).verifyEncoded();
+        return hashesMatch;
     }
 }

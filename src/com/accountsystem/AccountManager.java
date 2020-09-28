@@ -44,6 +44,22 @@ public class AccountManager{
         return account;
     }
 
+    public static Account registerAccountWithEmail(String name, String pass) throws IOException, ParseException {
+        //TODO Make email
+        if (nameExists(name)){
+            return new Account();
+        }
+        UUID uuid = createUUID();
+        try {
+            pass = encryptPassword(pass, uuid);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        Account account = new Account(name, pass, uuid);
+        writeToJson(name, pass, uuid);
+        return account;
+    }
+
     private static void loadHashMapValues() throws IOException, ParseException {
         File folder = new File(new File(".").getCanonicalPath() + "/Accounts");
         File[] listOfFiles = folder.listFiles();
@@ -121,12 +137,7 @@ public class AccountManager{
         for (Object obj : uuidSet) {
             JSONObject jsonObject = readFromJson(obj.toString());
             String encryptedPass = jsonObject.get(PASSKEY).toString();
-            byte[] hash = Base64.getUrlDecoder().decode(encryptedPass);
-            byte[] salt = Arrays.copyOfRange(hash, 0, 16);
-            String currentAttemptPasswordHash = Encrypter.encryptWithGivenSalt(password, salt);
-            System.out.println(currentAttemptPasswordHash);
-            System.out.println(encryptedPass);
-            if (encryptedPass.equals(currentAttemptPasswordHash)) {
+            if (Encrypter.authorizePassword(encryptedPass, password)) {
                 return new Account(name, encryptedPass, UUID.fromString(obj.toString()));
             }
         }
