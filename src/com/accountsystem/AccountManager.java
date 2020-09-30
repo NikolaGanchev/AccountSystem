@@ -8,11 +8,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.*;
 
 import com.accountsystem.Account;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import javax.xml.crypto.Data;
 
 public class AccountManager{
     private static HashMap<String, String> uuidNamesHashMap = new HashMap<>();
@@ -35,7 +38,7 @@ public class AccountManager{
         }
         UUID uuid = createUUID();
         try {
-            pass = encryptPassword(pass, uuid);
+            pass = encryptPassword(pass);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
@@ -44,19 +47,17 @@ public class AccountManager{
         return account;
     }
 
-    public static Account registerAccountWithEmail(String name, String pass) throws IOException, ParseException {
+    public static Account registerAccountWithEmail(String name, String pass, String email) throws IOException, ParseException, SQLException {
         //TODO Make email
-        if (nameExists(name)){
-            return new Account();
-        }
         UUID uuid = createUUID();
         try {
-            pass = encryptPassword(pass, uuid);
+            pass = encryptPassword(pass);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
-        Account account = new Account(name, pass, uuid);
-        writeToJson(name, pass, uuid);
+        Account account = new Account(name, pass, uuid, email);
+        Database database = new Database();
+        database.createDatabaseEntry(name, pass, uuid.toString(), email);
         return account;
     }
 
@@ -82,7 +83,7 @@ public class AccountManager{
         uuidNamesHashMap.put(uuid.toString(), name);
     }
 
-    private static String encryptPassword(String password, UUID uuid) throws GeneralSecurityException {
+    private static String encryptPassword(String password) throws GeneralSecurityException {
         Encrypter.initEncrypter();
         String encryptedData = Encrypter.encrypt(password);
         return encryptedData;

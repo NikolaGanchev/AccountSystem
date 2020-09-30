@@ -11,12 +11,13 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
     public static final Set<Integer> VALIDVALUES = Set.of(1, 2);
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, SQLException {
         System.out.println("Enter 1 to create account. Enter 2 to log in.");
         Scanner input = new Scanner(System.in);
             int number = getNumberInput();
@@ -32,7 +33,9 @@ public class Main {
                     String nameRegister = input.nextLine();
                     System.out.println("Input your password:");
                     String passwordRegister = input.nextLine();
-                    AccountManager.registerAccount(nameRegister, passwordRegister);
+                    System.out.println("Input your email:");
+                    String emailRegister = input.nextLine();
+                    AccountManager.registerAccountWithEmail(nameRegister, passwordRegister, emailRegister);
                     System.out.println("Account created.");
                     break;
                 case 2:
