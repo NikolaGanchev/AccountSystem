@@ -7,10 +7,8 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class Database {
 
@@ -22,6 +20,7 @@ public class Database {
 
     public Database() throws SQLException {
         this.connection = this.getConnection();
+        this.getDatabaseEntry("userName", "Nikola");
     }
     private static String readDatabaseLogInInfo(String key){
         try {
@@ -45,4 +44,16 @@ public class Database {
         preparedStatement.setString(4, UUID);
         preparedStatement.execute();
     }
+
+    private void getDatabaseEntry(String colName, String stringToSearchFor) throws SQLException {
+        PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT userName FROM users WHERE ? = ?");
+        preparedStatement.setString(1, colName);
+        preparedStatement.setString(2,stringToSearchFor);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        System.out.println(resultSet.getString("userName"));
+    }
+
+    /*private String[] convertResultSetToStringArray(ResultSet resultSet){
+        ArrayList<String> =
+    }*/
 }

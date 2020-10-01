@@ -20,6 +20,7 @@ public class Main {
     public static void main(String[] args) throws IOException, ParseException, SQLException {
         System.out.println("Enter 1 to create account. Enter 2 to log in.");
         Scanner input = new Scanner(System.in);
+        Database database = new Database();
             int number = getNumberInput();
             if(!VALIDVALUES.contains(number) && number != 0){
                 System.err.println("Please enter either 1 or 2");
