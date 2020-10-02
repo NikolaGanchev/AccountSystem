@@ -1,14 +1,12 @@
 package com.accountsystem;
 
+import com.sun.jdi.InvalidTypeException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class Database {
 
@@ -18,9 +16,12 @@ public class Database {
     private Connection connection;
 
 
-    public Database() throws SQLException {
-        this.connection = this.getConnection();
-        this.getDatabaseEntry("userName", "Nikola");
+    public Database(){
+        try {
+            this.connection = this.getConnection();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
     private static String readDatabaseLogInInfo(String key){
         try {
@@ -45,15 +46,35 @@ public class Database {
         preparedStatement.execute();
     }
 
-    private void getDatabaseEntry(String colName, String stringToSearchFor) throws SQLException {
-        PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT userName FROM users WHERE ? = ?");
-        preparedStatement.setString(1, colName);
-        preparedStatement.setString(2,stringToSearchFor);
+    public ResultSet getDatabaseProfiles(DATABASECOLUMNS databasecolumns, String stringToSearchFor) throws SQLException, InvalidTypeException {
+        PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT userName, userUUID, userPassword, userEmail FROM users WHERE " + getColumnStringFromEnum(databasecolumns) + " = ?");
+        preparedStatement.setString(1,stringToSearchFor);
         ResultSet resultSet = preparedStatement.executeQuery();
-        System.out.println(resultSet.getString("userName"));
+        return resultSet;
     }
 
-    /*private String[] convertResultSetToStringArray(ResultSet resultSet){
-        ArrayList<String> =
-    }*/
+    public boolean checkIfExists(DATABASECOLUMNS databasecolumns, String stringToSearchFor) throws InvalidTypeException, SQLException {
+        String column = getColumnStringFromEnum(databasecolumns);
+        PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT " + column + " FROM users WHERE " + column + " = ?");
+        preparedStatement.setString(1, stringToSearchFor);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(!resultSet.next()){
+            return false;
+        }
+        return true;
+    }
+    private String getColumnStringFromEnum(DATABASECOLUMNS databasecolumns) throws InvalidTypeException {
+        switch(databasecolumns){
+            case userName:
+                return "userName";
+            case userPassword:
+                return "userPassword";
+            case userUUID:
+                return "userUUID";
+            case userEmail:
+                return "userEmail";
+            default:
+                throw new InvalidTypeException();
+        }
+    }
 }
