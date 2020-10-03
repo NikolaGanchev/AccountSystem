@@ -1,22 +1,20 @@
 package com.accountsystem;
 
 import com.sun.jdi.InvalidTypeException;
-import org.json.simple.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.json.simple.parser.ParseException;
+import javax.security.auth.login.AccountException;
 
 public class AccountManager{
-    final private static String NAMEKEY = "Name";
-    final private static String PASSKEY = "Password";
-    final private static String UUIDKEY = "UUID";
+    final private static String NAME_KEY = "userName";
+    final private static String PASS_KEY = "userPassword";
+    final private static String UUID_KEY = "userUUID";
+    final private static String EMAIL_KEY = "userEmail";
     static Database database = new Database();
 
+    @Deprecated
     public static Account registerAccount(String name, String pass) throws SQLException, InvalidTypeException {
         if (nameExists(name)){
             return new Account();
@@ -32,9 +30,9 @@ public class AccountManager{
         return account;
     }
 
-    public static Account registerAccountWithEmail(String name, String pass, String email) throws IOException, ParseException, SQLException, InvalidTypeException {
+    public static Account registerAccountWithEmail(String name, String pass, String email) throws SQLException, InvalidTypeException, AccountException {
         if (emailExists(email)){
-            return new Account();
+            throw new AccountException();
         }
         UUID uuid = createUUID();
         try {
@@ -48,27 +46,10 @@ public class AccountManager{
         return account;
     }
 
-    /*private static void loadHashMapValues() throws IOException, ParseException {
-        File folder = new File(new File(".").getCanonicalPath() + "/Accounts");
-        File[] listOfFiles = folder.listFiles();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                String filename = listOfFiles[i].getName();
-                JSONObject jsonObject = readFromJson(filename.substring(0, filename.length() - 5));
-
-                addNameAndUUIDToHashMap(jsonObject.get(NAMEKEY).toString(), UUID.fromString(jsonObject.get(UUIDKEY).toString()));
-            }
-        }
-    }*/
     private static UUID createUUID(){
         UUID uuid = UUID.randomUUID();
         return uuid;
     }
-
-    /*private static void addNameAndUUIDToHashMap(String name, UUID uuid){
-        uuidNamesHashMap.put(uuid.toString(), name);
-    }*/
 
     private static String encryptPassword(String password) throws GeneralSecurityException {
         Encrypter.initEncrypter();
@@ -76,31 +57,31 @@ public class AccountManager{
         return encryptedData;
     }
 
-    /*public static Account logIntoAccount(String name, String password) throws IOException, ParseException, GeneralSecurityException {
-        Set<String> uuidSet = getUUIDSetByName(name);
-        for (Object obj : uuidSet) {
-            if (Encrypter.authorizePassword(encryptedPass, password)) {
-                return new Account(name, encryptedPass, UUID.fromString(obj.toString()));
+    public static Account logIntoAccountWithEmail(String email, String password) throws SQLException, InvalidTypeException {
+
+        ResultSet resultSet = database.getDatabaseProfiles(DatabaseColumns.USER_EMAIL, email);
+        while(resultSet.next()){
+            String currentAccountPassword = resultSet.getString(PASS_KEY);
+            if(Encrypter.authorizePassword(currentAccountPassword, password)){
+                String currentAccountEmail = resultSet.getString(EMAIL_KEY);
+                String currentAccountName = resultSet.getString(NAME_KEY);
+                String currentAccountUUID = resultSet.getString(UUID_KEY);
+                return new Account(currentAccountName, currentAccountPassword, UUID.fromString(currentAccountUUID), currentAccountEmail);
             }
         }
         return new Account();
-    }*/
-
-    /*private static Set<String> getUUIDSetByName(String name){
-        Set<String> keys = new HashSet<String>();
-        for (Map.Entry<String, String> entry : uuidNamesHashMap.entrySet()) {
-            if (Objects.equals(name, entry.getValue())) {
-                keys.add(entry.getKey());
-            }
-        }
-        return keys;
-    }*/
+    }
 
     private static boolean nameExists(String name) throws SQLException, InvalidTypeException {
-        return database.checkIfExists(DATABASECOLUMNS.userName, name);
+        return database.checkIfExists(DatabaseColumns.USER_NAME, name);
     }
 
     private static boolean emailExists(String email) throws SQLException, InvalidTypeException {
-        return database.checkIfExists(DATABASECOLUMNS.userEmail, email);
+        return database.checkIfExists(DatabaseColumns.USER_EMAIL, email);
+    }
+
+    public static boolean deleteAccount(Account account) throws SQLException {
+        database.deleteAccount(account);
+        return true;
     }
 }

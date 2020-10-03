@@ -46,14 +46,14 @@ public class Database {
         preparedStatement.execute();
     }
 
-    public ResultSet getDatabaseProfiles(DATABASECOLUMNS databasecolumns, String stringToSearchFor) throws SQLException, InvalidTypeException {
+    public ResultSet getDatabaseProfiles(DatabaseColumns databasecolumns, String stringToSearchFor) throws SQLException, InvalidTypeException {
         PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT userName, userUUID, userPassword, userEmail FROM users WHERE " + getColumnStringFromEnum(databasecolumns) + " = ?");
         preparedStatement.setString(1,stringToSearchFor);
         ResultSet resultSet = preparedStatement.executeQuery();
         return resultSet;
     }
 
-    public boolean checkIfExists(DATABASECOLUMNS databasecolumns, String stringToSearchFor) throws InvalidTypeException, SQLException {
+    public boolean checkIfExists(DatabaseColumns databasecolumns, String stringToSearchFor) throws InvalidTypeException, SQLException {
         String column = getColumnStringFromEnum(databasecolumns);
         PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT " + column + " FROM users WHERE " + column + " = ?");
         preparedStatement.setString(1, stringToSearchFor);
@@ -63,15 +63,21 @@ public class Database {
         }
         return true;
     }
-    private String getColumnStringFromEnum(DATABASECOLUMNS databasecolumns) throws InvalidTypeException {
+
+    public void deleteAccount(Account account) throws SQLException {
+        PreparedStatement preparedStatement = this.connection.prepareStatement("DELETE FROM USERS WHERE userUUID = ?");
+        preparedStatement.setString(1, account.getUUID());
+        preparedStatement.execute();
+    }
+    private String getColumnStringFromEnum(DatabaseColumns databasecolumns) throws InvalidTypeException {
         switch(databasecolumns){
-            case userName:
+            case USER_NAME:
                 return "userName";
-            case userPassword:
+            case USER_PASSWORD:
                 return "userPassword";
-            case userUUID:
+            case USER_UUID:
                 return "userUUID";
-            case userEmail:
+            case USER_EMAIL:
                 return "userEmail";
             default:
                 throw new InvalidTypeException();

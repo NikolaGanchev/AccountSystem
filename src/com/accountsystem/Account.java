@@ -1,6 +1,5 @@
 package com.accountsystem;
 
-import javax.lang.model.type.NullType;
 import java.util.UUID;
 
 public class Account {
@@ -9,12 +8,12 @@ public class Account {
     private UUID uuid;
     private String email;
     private boolean isNull = false;
+
     public Account(String name, String password, UUID uuid){
         this.name = name;
         this.password = password;
         this.uuid = uuid;
     }
-
 
     public Account(String name, String password, UUID uuid, String email){
         this.name = name;
