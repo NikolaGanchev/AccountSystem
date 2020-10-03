@@ -52,7 +52,6 @@ public class AccountManager{
     }
 
     private static String encryptPassword(String password) throws GeneralSecurityException {
-        Encrypter.initEncrypter();
         String encryptedData = Encrypter.encrypt(password);
         return encryptedData;
     }
