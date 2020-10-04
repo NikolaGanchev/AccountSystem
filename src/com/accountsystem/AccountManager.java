@@ -32,7 +32,7 @@ public class AccountManager{
 
     public static Account registerAccountWithEmail(String name, String pass, String email) throws SQLException, InvalidTypeException, AccountException, AccountEmailAlreadyExistsException {
         if (emailExists(email)){
-            throw new AccountEmailAlreadyExistsException("Account name '" + email + "' already exists.");
+            throw new AccountEmailAlreadyExistsException("Account email '" + email + "' already exists.");
         }
         UUID uuid = createUUID();
         try {
@@ -75,7 +75,7 @@ public class AccountManager{
         return database.checkIfExists(DatabaseColumns.USER_NAME, name);
     }
 
-    private static boolean emailExists(String email) throws SQLException, InvalidTypeException {
+    public static boolean emailExists(String email) throws SQLException, InvalidTypeException {
         return database.checkIfExists(DatabaseColumns.USER_EMAIL, email);
     }
 

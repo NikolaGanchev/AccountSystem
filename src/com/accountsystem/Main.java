@@ -6,6 +6,7 @@ package com.accountsystem;
 import com.sun.jdi.InvalidTypeException;
 
 import javax.security.auth.login.AccountException;
+import java.lang.constant.Constable;
 import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.Set;
@@ -19,15 +20,14 @@ public class Main {
         }
 
 
-    static int getNumberInput(){
+    static Integer getNumberInput(){
         Scanner input = new Scanner(System.in);
         int number = 0;
         try {
             number = input.nextInt();
         }
-        catch (Exception e){
-            input.close();
-            return 0;
+        catch (Exception e) {
+            return null;
         }
         return number;
     }
@@ -36,8 +36,9 @@ public class Main {
         System.out.println("Enter 1 to create account. Enter 2 to log in.");
         Scanner input = new Scanner(System.in);
         int number = getNumberInput();
-        if(!VALIDVALUES.contains(number) && number != 0){
+        if(!VALIDVALUES.contains(number)){
             System.err.println("Please enter either 1 or 2");
+            return;
         }
         switch (number) {
             case 0:
@@ -68,16 +69,37 @@ public class Main {
                         System.out.println(account.getUUID());
                         System.out.println(account.getEmail());
                         System.out.println("Logged in");
-                        System.out.println("If you want to delete account, enter 3");
-                        if (input.nextLine().equals("3")) {
-                            AccountManager.deleteAccount(account);
-                            System.out.println("Account deleted");
+                        System.out.println("If you want to delete account, enter 3. \n If you want to change name, enter 4. \n Email is 5. \n Password is 6.");
+                        switch (input.nextLine()) {
+                            case("3"):
+                                AccountManager.deleteAccount(account);
+                                System.out.println("Account deleted");
+                                break;
+                            case("4"):
+                                System.out.println("Enter new name:");
+                                String newName = input.nextLine();
+                                account.changeName(newName);
+                                break;
+                            case("5"):
+                                System.out.println("Enter new email:");
+                                String newEmail = input.nextLine();
+                                account.changeEmail(newEmail);
+                                break;
+                            case("6"):
+                                System.out.println("Enter new password:");
+                                String newPassword = input.nextLine();
+                                account.changePassword(newPassword);
+                                break;
+                            default:
+                                break;
                         }
                     }
                     catch (NoMatchingAccountException e){
                         System.out.println("Null account returned");
+                    } catch (AccountEmailAlreadyExistsException e) {
+                        e.printStackTrace();
                     }
-                
+
                 break;
             default:
 

@@ -69,6 +69,14 @@ public class Database {
         preparedStatement.setString(1, account.getUUID());
         preparedStatement.execute();
     }
+
+    public void updateEntry(Account account, DatabaseColumns column, String newValue) throws SQLException, InvalidTypeException {
+        PreparedStatement preparedStatement = this.connection.prepareStatement("UPDATE users SET " + getColumnStringFromEnum(column) + " = ? WHERE userUUID = ?");
+        preparedStatement.setString(1, newValue);
+        preparedStatement.setString(2, account.getUUID());
+        preparedStatement.execute();
+
+    }
     private String getColumnStringFromEnum(DatabaseColumns databasecolumns) throws InvalidTypeException {
         switch(databasecolumns){
             case USER_NAME:
