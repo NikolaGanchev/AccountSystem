@@ -15,9 +15,9 @@ public class AccountManager{
     static Database database = new Database();
 
     @Deprecated
-    public static Account registerAccount(String name, String pass) throws SQLException, InvalidTypeException {
+    public static Account registerAccount(String name, String pass) throws SQLException, InvalidTypeException, AccountNameAlreadyExistsException {
         if (nameExists(name)){
-            return new Account();
+            throw new AccountNameAlreadyExistsException("Account name '" + name + "' already exists.");
         }
         UUID uuid = createUUID();
         try {
@@ -30,9 +30,9 @@ public class AccountManager{
         return account;
     }
 
-    public static Account registerAccountWithEmail(String name, String pass, String email) throws SQLException, InvalidTypeException, AccountException {
+    public static Account registerAccountWithEmail(String name, String pass, String email) throws SQLException, InvalidTypeException, AccountException, AccountEmailAlreadyExistsException {
         if (emailExists(email)){
-            throw new AccountException();
+            throw new AccountEmailAlreadyExistsException("Account name '" + email + "' already exists.");
         }
         UUID uuid = createUUID();
         try {
@@ -56,7 +56,7 @@ public class AccountManager{
         return encryptedData;
     }
 
-    public static Account logIntoAccountWithEmail(String email, String password) throws SQLException, InvalidTypeException {
+    public static Account logIntoAccountWithEmail(String email, String password) throws SQLException, InvalidTypeException, NoMatchingAccountException {
 
         ResultSet resultSet = database.getDatabaseProfiles(DatabaseColumns.USER_EMAIL, email);
         while(resultSet.next()){
@@ -68,7 +68,7 @@ public class AccountManager{
                 return new Account(currentAccountName, currentAccountPassword, UUID.fromString(currentAccountUUID), currentAccountEmail);
             }
         }
-        return new Account();
+        throw new NoMatchingAccountException("Could not find account with matching credentials.");
     }
 
     private static boolean nameExists(String name) throws SQLException, InvalidTypeException {

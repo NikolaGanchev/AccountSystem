@@ -50,34 +50,34 @@ public class Main {
                 String passwordRegister = input.nextLine();
                 System.out.println("Input your email:");
                 String emailRegister = input.nextLine();
-                AccountManager.registerAccountWithEmail(nameRegister, passwordRegister, emailRegister);
+                try {
+                    AccountManager.registerAccountWithEmail(nameRegister, passwordRegister, emailRegister);
+                } catch (AccountEmailAlreadyExistsException e) {
+                    e.printStackTrace();
+                }
                 System.out.println("Account created.");
                 break;
             case 2:
 
-                try {
                     System.out.println("Input your email:");
                     String emailLogin = input.nextLine();
                     System.out.println("Input your password:");
                     String passwordLogin = input.nextLine();
-                    Account account = AccountManager.logIntoAccountWithEmail(emailLogin, passwordLogin);
-                    if(!account.isNull()){
+                    try {
+                        Account account = AccountManager.logIntoAccountWithEmail(emailLogin, passwordLogin);
                         System.out.println(account.getUUID());
                         System.out.println(account.getEmail());
                         System.out.println("Logged in");
                         System.out.println("If you want to delete account, enter 3");
-                        if(input.nextLine().equals("3")){
+                        if (input.nextLine().equals("3")) {
                             AccountManager.deleteAccount(account);
                             System.out.println("Account deleted");
                         }
                     }
-                    if(account.isNull()){
+                    catch (NoMatchingAccountException e){
                         System.out.println("Null account returned");
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                ;
+                
                 break;
             default:
 

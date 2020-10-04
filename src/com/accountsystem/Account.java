@@ -7,7 +7,6 @@ public class Account {
     private String password;
     private UUID uuid;
     private String email;
-    private boolean isNull = false;
 
     public Account(String name, String password, UUID uuid){
         this.name = name;
@@ -20,14 +19,6 @@ public class Account {
         this.password = password;
         this.uuid = uuid;
         this.email = email;
-    }
-
-    public Account(){
-        isNull = true;
-    }
-
-    public boolean isNull() {
-        return isNull;
     }
 
     public String getName() {
